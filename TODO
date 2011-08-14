@@ -1,0 +1,6 @@
+Custom headers
+request.endFile to send file
+request.end and request.write should accept Buffer
+response.data should be Buffer
+response.headers should be complete
+Add curl.post (options, data)

@@ -99,6 +99,51 @@ request6.assert.equal (data.statusCode, 200);
 request6.assert.deepEqual (data.headers, { 'content-type': 'text/plain' });
 request6.finish();
 
+var request7 = new testy({
+    expected : 3,
+    name : 'request with HEAD'
+});
+
+var req = curl.request ({
+    url: "http://localhost:9000",
+    method: "HEAD"
+});
+var data = req.end ();
+
+request7.assert.equal (data.data, "");
+request7.assert.equal (data.statusCode, 200);
+request7.assert.deepEqual (data.headers, { 'content-type': 'text/plain' });
+request7.finish();
+
+//-------------------------------------------------------------------------
+
+var request8 = new testy({
+    expected : 6,
+    name : 'request with other heads'
+});
+
+var req1 = curl.request ({
+    url: "http://localhost:9000",
+    method: "PUT"
+});
+var data1 = req1.end ();
+
+var req2 = curl.request ({
+    url: "http://localhost:9000",
+    method: "DELETE"
+});
+var data2 = req2.end ();
+
+request8.assert.equal (data1.data, "PUT\n");
+request8.assert.equal (data1.statusCode, 200);
+request8.assert.deepEqual (data1.headers, { 'content-type': 'text/plain' });
+request8.assert.equal (data2.data, "DELETE\n");
+request8.assert.equal (data2.statusCode, 200);
+request8.assert.deepEqual (data2.headers, { 'content-type': 'text/plain' });
+request8.finish();
+
+//-------------------------------------------------------------------------
+
 var get1 = new testy({
     expected : 3,
     name : 'Empty get'
@@ -113,6 +158,8 @@ get1.assert.equal (data.data, "GET\n");
 get1.assert.equal (data.statusCode, 200);
 get1.assert.deepEqual (data.headers, { 'content-type': 'text/plain' });
 get1.finish ();
+
+//-------------------------------------------------------------------------
 
 var get2 = new testy({
     expected : 3,
@@ -132,6 +179,8 @@ var error1 = new testy({
     name : 'should throw when reusing req after req.end'
 });
 
+//-------------------------------------------------------------------------
+
 error1.assert.throws (
     function () {
         var req = curl.get ("http://localhost:9000");
@@ -141,3 +190,22 @@ error1.assert.throws (
     "Request is already sent"
 );
 error1.finish ();
+
+//-------------------------------------------------------------------------
+
+var error2 = new testy({
+    expected : 1,
+    name : 'request with invalid heads'
+});
+
+error2.assert.throws (
+    function () {
+        var req = curl.request ({
+            url: "http://localhost:9000",
+            method: "FUCK"
+        });
+        var data = req.end ();
+    },
+    "Server returned nothing"
+);
+error2.finish ();

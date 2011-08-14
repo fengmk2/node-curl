@@ -9,7 +9,6 @@
 
 Request::Request ()
     : curl_ (curl_easy_init ()),
-      is_post_ (false),
       read_pos_ (0)
 {
     curl_easy_setopt (curl_, CURLOPT_READFUNCTION, read_data);
@@ -31,13 +30,20 @@ Handle<Value> Request::New (Handle<Object> options) {
 
     // Set options
     Handle<Value> url    = options->Get (String::New ("url"));
-    Handle<Value> method = options->Get (String::New ("method"));
     // options.url
     curl_easy_setopt (request->curl_, CURLOPT_URL, *String::Utf8Value (url));
     // options.method
-    if (!strcasecmp ("POST", *String::AsciiValue (method))) {
-        request->is_post_ = true;
-        curl_easy_setopt (request->curl_, CURLOPT_POST, 1);
+    if (options->Has (String::New ("method"))) {
+        String::AsciiValue method (options->Get (String::New ("method")));
+        if (!strcasecmp ("POST", *method)) {
+            curl_easy_setopt (request->curl_, CURLOPT_POST, 1);
+        } else if (!strcasecmp ("GET", *method)) {
+            curl_easy_setopt (request->curl_, CURLOPT_HTTPGET, 1);
+        } else if (!strcasecmp ("HEAD", *method)) {
+            curl_easy_setopt (request->curl_, CURLOPT_NOBODY, 1);
+        } else {
+            curl_easy_setopt (request->curl_, CURLOPT_CUSTOMREQUEST, *method);
+        }
     }
     // options.useragent
     if (options->Has (String::New ("useragent"))) {
@@ -45,6 +51,10 @@ Handle<Value> Request::New (Handle<Object> options) {
               *String::AsciiValue (options->Get (String::New ("useragent"))));
     } else {
         curl_easy_setopt (request->curl_, CURLOPT_USERAGENT, "zcbenz/node-curl");
+    }
+    // options.debug
+    if (options->Get (String::New ("debug"))->BooleanValue ()) {
+        curl_easy_setopt (request->curl_, CURLOPT_VERBOSE, true);
     }
 
     return handle;
@@ -89,8 +99,7 @@ Handle<Value> Request::end (const Arguments& args) {
         return THROW_REQUEST_ALREADY_SEND;
 
     // Must set file size
-    if (request->is_post_)
-        curl_easy_setopt (request->curl_, CURLOPT_POSTFIELDSIZE, request->read_buffer_.size ());
+    curl_easy_setopt (request->curl_, CURLOPT_POSTFIELDSIZE, request->read_buffer_.size ());
 
     // Send them all!
     CURLcode res = curl_easy_perform (request->curl_);
