@@ -39,6 +39,13 @@ Handle<Value> Request::New (Handle<Object> options) {
         request->is_post_ = true;
         curl_easy_setopt (request->curl_, CURLOPT_POST, 1);
     }
+    // options.useragent
+    if (options->Has (String::New ("useragent"))) {
+        curl_easy_setopt (request->curl_, CURLOPT_USERAGENT,
+              *String::AsciiValue (options->Get (String::New ("useragent"))));
+    } else {
+        curl_easy_setopt (request->curl_, CURLOPT_USERAGENT, "zcbenz/node-curl");
+    }
 
     return handle;
 }
