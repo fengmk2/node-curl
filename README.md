@@ -52,11 +52,11 @@ var req = curl.get ({ url : "http://cnodejs.org"});
 var req = curl.get ("http://cnodejs.org");
 ```
 
-### request.write (data)
+### request.write (chunk)
  
- Write string to the request.
+ Write a chunk of data to the request. The type of data can be String or Buffer.
 
-### request.end ([data])
+### request.end ([chunk])
 
  Send the request and get response.
 

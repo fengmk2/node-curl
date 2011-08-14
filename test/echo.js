@@ -10,13 +10,14 @@ require("http").createServer(function (req, res) {
   }
 
   res.writeHead(200, {'Content-Type': 'text/plain'});
-  res.write(req.method + "\n");
+  if (!req.headers["nomethod"])
+      res.write(req.method + "\n");
 
   if (req.headers["custom"]) {
-    res.write (JSON.stringify(req.headers));
+      res.write (JSON.stringify(req.headers));
   }
 
-  var data = "";
+  var data = new Buffer("");
   req.on("data", function(chunk) {
       data += chunk;
   });

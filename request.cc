@@ -73,17 +73,28 @@ Handle<Value> Request::New (Handle<Object> options) {
 Handle<Value> Request::write (const Arguments& args) {
     HandleScope scope;
 
-    if (args.Length () != 1 && !args[0]->IsString ())
+    if (args.Length () != 1)
         return THROW_BAD_ARGS;
 
     Request *request = Unwrap (args.Holder ());
     if (!request)
         return THROW_REQUEST_ALREADY_SEND;
 
-    String::Utf8Value chunk (Handle<String>::Cast (args[0]));
-    request->read_buffer_.insert (request->read_buffer_.end (),
-                                  *chunk,
-                                  *chunk + chunk.length ());
+    if (args[0]->IsString ()) {
+        String::Utf8Value chunk (Handle<String>::Cast (args[0]));
+        request->read_buffer_.insert (request->read_buffer_.end (),
+                                      *chunk,
+                                      *chunk + chunk.length ());
+    } else if (args[0]->IsObject ()) {
+        Handle<Object> buffer = Handle<Object>::Cast (args[0]);
+        char *data  = node::Buffer::Data (buffer);
+        size_t length = node::Buffer::Length (buffer);
+
+        request->read_buffer_.insert (request->read_buffer_.end (),
+                                      data, data + length);
+    } else {
+        return THROW_BAD_ARGS;
+    }
 
     return Undefined ();
 }
@@ -97,7 +108,7 @@ Handle<Value> Request::end (const Arguments& args) {
 
     // Have chunk
     if (args.Length () == 1) {
-        if (!args[0]->IsString ())
+        if (!args[0]->IsString () && !args[0]->IsObject ())
             return THROW_BAD_ARGS;
 
         Request::write (args);

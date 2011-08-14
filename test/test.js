@@ -209,6 +209,32 @@ request10.finish();
 
 //-------------------------------------------------------------------------
 
+var request11 = new testy({
+    expected : 1,
+    name : 'write with Buffer'
+});
+
+var req = curl.request ({
+    url: "http://localhost:9000",
+    method: "POST",
+    headers: { "nomethod": "true" }
+});
+var buf = new Buffer (8);
+buf.writeUInt8(0x3, 0, 'big');
+buf.writeUInt8(0x4, 1, 'big');
+buf.writeUInt8(0x23, 2, 'big');
+buf.writeUInt8(0x42, 3, 'big');
+buf.writeUInt8(0x3, 4, 'little');
+buf.writeUInt8(0x4, 5, 'little');
+buf.writeUInt8(0x23, 6, 'little');
+buf.writeUInt8(0x42, 7, 'little');
+var res = req.end (buf);
+
+request11.assert.deepEqual (res.data, buf);
+request11.finish();
+
+//-------------------------------------------------------------------------
+
 var get1 = new testy({
     expected : 3,
     name : 'Empty get'
