@@ -56,6 +56,14 @@ Handle<Value> Request::New (Handle<Object> options) {
     if (options->Get (String::New ("debug"))->BooleanValue ()) {
         curl_easy_setopt (request->curl_, CURLOPT_VERBOSE, true);
     }
+    // options.headers
+    if (options->Has (String::New ("headers"))) {
+        Handle<Value> headers = options->Get (String::New ("headers"));
+        if (!headers->IsObject ())
+            return THROW_BAD_ARGS;
+
+        request->AddHeaders (Handle<Object>::Cast (headers));
+    }
 
     return handle;
 }
@@ -163,6 +171,26 @@ Handle<Object> Request::GetResult () const {
     }
 
     return scope.Close (result);
+}
+
+void Request::AddHeaders (Handle<Object> headers) const {
+    HandleScope scope;
+
+    Local<Array> keys = headers->GetPropertyNames ();
+
+    struct curl_slist *list = NULL;
+    for (size_t i = 0; i< keys->Length (); ++i) {
+        char line[512];
+
+        Local<Value> key   = keys->Get (i);
+        Local<Value> value = headers->Get (key);
+        snprintf (line, 512, "%s: %s", *String::AsciiValue (key),
+                                       *String::AsciiValue (value));
+
+        list = curl_slist_append (list, line);
+    }
+
+    curl_easy_setopt (curl_, CURLOPT_HTTPHEADER, list);
 }
 
 size_t Request::read_data (void *ptr, size_t size, size_t nmemb, void *userdata) {

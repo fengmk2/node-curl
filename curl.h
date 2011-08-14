@@ -41,6 +41,9 @@ class Request {
         // Translate curl result to Object
         Handle<Object> GetResult () const;
 
+        // Add custom headers
+        void AddHeaders (Handle<Object> headers) const;
+
         // Callbacks with curl
         static size_t read_data (void *ptr, size_t size, size_t nmemb, void *userdata);
         static size_t write_data (void *ptr, size_t size, size_t nmemb, void *userdata);

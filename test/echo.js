@@ -1,5 +1,5 @@
 require("http").createServer(function (req, res) {
-  if (res.method == "HEAD") {
+  if (req.method == "HEAD") {
     res.writeHead(200, {
         'Content-Type'  : 'text/plain',
         'Date'          : 'Wed, 17 Mar 2004 18 : 00 : 49 GMT',
@@ -11,6 +11,10 @@ require("http").createServer(function (req, res) {
 
   res.writeHead(200, {'Content-Type': 'text/plain'});
   res.write(req.method + "\n");
+
+  if (req.headers["custom"]) {
+    res.write (JSON.stringify(req.headers));
+  }
 
   var data = "";
   req.on("data", function(chunk) {
