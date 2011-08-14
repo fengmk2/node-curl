@@ -44,13 +44,16 @@ class Request {
         // Add custom headers
         void AddHeaders (Handle<Object> headers) const;
 
+        // Parse headers to object
+        Handle<Object> ParseHeaders () const;
+
         // Callbacks with curl
         static size_t read_data (void *ptr, size_t size, size_t nmemb, void *userdata);
         static size_t write_data (void *ptr, size_t size, size_t nmemb, void *userdata);
 
         CURL *curl_;
         typedef std::vector<char> buffer_t;
-        buffer_t read_buffer_, write_buffer_;
+        buffer_t read_buffer_, write_buffer_, header_buffer_;
         size_t read_pos_;
 
     protected:

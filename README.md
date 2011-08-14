@@ -89,6 +89,7 @@ req.endFile ("/etc/passwd");
  fields:
 
  - `data`        A Buffer that stores data sent by server.
- - `headers`     Response headers.
+ - `headers`     Complete response headers, even contains those custom ones.
+ - `ip`          IP address of the server.
  - `statusCode`  Status code that sent by server.
 

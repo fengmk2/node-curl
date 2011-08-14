@@ -9,7 +9,15 @@ require("http").createServer(function (req, res) {
     return;
   }
 
-  res.writeHead(200, {'Content-Type': 'text/plain'});
+  if (req.headers["customheaders"]) {
+      res.writeHead(42, {
+          'Content-Type': 'text/plain',
+          'customheaders': req.headers['customheaders']
+      });
+  } else {
+      res.writeHead(200, {'Content-Type': 'text/plain'});
+  }
+
   if (!req.headers["nomethod"])
       res.write(req.method + "\n");
 

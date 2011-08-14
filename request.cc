@@ -1,12 +1,16 @@
 #include "curl.h"
 #include <iostream>
+#include <string>
 #include <utility>
+#include <algorithm>
 #include <string.h>
 #include <stdio.h>
 #include <errno.h>
+
 #include <sys/types.h>
 #include <sys/stat.h>
 #include <unistd.h>
+
 #include <node_buffer.h>
 
 #define THROW_REQUEST_ALREADY_SEND \
@@ -17,7 +21,8 @@ Request::Request ()
       read_pos_ (0)
 {
     curl_easy_setopt (curl_, CURLOPT_WRITEFUNCTION, write_data);
-    curl_easy_setopt (curl_, CURLOPT_WRITEDATA, this);
+    curl_easy_setopt (curl_, CURLOPT_WRITEDATA, &write_buffer_);
+    curl_easy_setopt (curl_, CURLOPT_HEADERDATA, &header_buffer_);
 }
 
 Request::~Request () {
@@ -203,26 +208,13 @@ Handle<Object> Request::GetResult () const {
 
     long statusCode;
     curl_easy_getinfo (curl_, CURLINFO_RESPONSE_CODE, &statusCode);
-    const char *content_type;
-    curl_easy_getinfo (curl_, CURLINFO_CONTENT_TYPE, &content_type);
-    double content_length;
-    curl_easy_getinfo (curl_, CURLINFO_CONTENT_LENGTH_DOWNLOAD, &content_length);
     const char *ip;
     curl_easy_getinfo (curl_, CURLINFO_PRIMARY_IP, &ip);
 
     Handle<Object> result = Object::New ();
     result->Set (String::NewSymbol ("statusCode"), Integer::New (statusCode));
     result->Set (String::NewSymbol ("ip"), String::New (ip));
-    Handle<Object> headers = Object::New ();
-    result->Set (String::NewSymbol ("headers"), headers);
-    if (content_type) {
-        headers->Set (String::NewSymbol ("content-type"),
-                      String::New (content_type));
-    }
-    if (content_length > -1) {
-        headers->Set (String::NewSymbol ("content-length"),
-                      Integer::New ((long) content_length));
-    }
+    result->Set (String::NewSymbol ("headers"), ParseHeaders ());
 
     // Set data as Buffer
     result->Set (String::NewSymbol ("data"), node::Buffer::New (
@@ -251,6 +243,44 @@ void Request::AddHeaders (Handle<Object> headers) const {
     curl_easy_setopt (curl_, CURLOPT_HTTPHEADER, list);
 }
 
+Handle<Object> Request::ParseHeaders () const {
+    HandleScope scope;
+    Handle<Object> headers = Object::New ();
+
+    buffer_t::const_iterator end = header_buffer_.end ();
+    // Skip first line
+    buffer_t::const_iterator it = header_buffer_.begin ();
+    while (*it != '\n' && it < end) ++it;
+    ++it;
+
+    while (it < end) {
+        // Find `:`
+        buffer_t::const_iterator tail = it;
+        while (*tail != ':' && tail < end) ++tail;
+
+        std::string key (it, tail);
+        if (key == "\r\n") break;
+
+        // toLowercase
+        std::transform (key.begin(), key.end(), key.begin(), ::tolower);
+
+        // Find `\n`
+        it = tail;
+        while (*it != '\r' && it < end) ++it;
+        ++tail;
+        while (*tail == ' ' && tail < it) ++tail;
+
+        std::string value (tail, it);
+
+        headers->Set (String::New (key.c_str (), key.size ()),
+                      String::New (value.c_str (), value.size ()));
+
+        std::advance (it, 2);
+    }
+
+    return scope.Close (headers);
+}
+
 size_t Request::read_data (void *ptr, size_t size, size_t nmemb, void *userdata) {
     Request *request = static_cast<Request*> (userdata);
 
@@ -271,13 +301,11 @@ size_t Request::read_data (void *ptr, size_t size, size_t nmemb, void *userdata)
 }
 
 size_t Request::write_data (void *ptr, size_t size, size_t nmemb, void *userdata) {
-    Request *request = static_cast<Request*> (userdata);
+    buffer_t *buffer = static_cast<buffer_t*> (userdata);
 
     // Copy data to buffer
     char *comein = static_cast<char*> (ptr);
-    request->write_buffer_.insert (request->write_buffer_.end (),
-                                   comein, 
-                                   comein + size * nmemb);
+    buffer->insert (buffer->end (), comein, comein + size * nmemb);
 
     return size * nmemb;
 }
