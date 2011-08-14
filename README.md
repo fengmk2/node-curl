@@ -8,7 +8,7 @@
 
 ## Build
   
-   node-waf configure && node-waf build
+    node-waf configure && node-waf build
 
 ## APIs
 
@@ -23,12 +23,12 @@
 
  Example
 
-     ```javascript
-     var req = curl.request ({
-         url: "http://cnodejs.org",
-         method: "GET"
-     });
-     ```
+```javascript
+var req = curl.request ({
+    url: "http://cnodejs.org",
+    method: "GET"
+});
+```
 
 ### curl.get ([options | url])
 
@@ -36,15 +36,15 @@
 
  And you can have
 
-     ```javascript
-     var req = curl.get ({ url : "http://cnodejs.org"});
-     ```
+```javascript
+var req = curl.get ({ url : "http://cnodejs.org"});
+```
 
  Or just straight forward
 
-     ```javascript
-     var req = curl.get ("http://cnodejs.org");
-     ```
+```javascript
+var req = curl.get ("http://cnodejs.org");
+```
 
 ### request.write (data)
  
@@ -56,13 +56,12 @@
 
  Example
 
- ```javascript
-     var req = curl.request ({
-         url: "http://cnodejs.org",
-         method: "POST"
-     });
-     req.write ("Some text\n");
-     req.write ("another text");
-     console.log (req.end ());
- ```
-
+```javascript
+var req = curl.request ({
+    url: "http://cnodejs.org",
+    method: "POST"
+});
+req.write ("Some text\n");
+req.write ("another text");
+console.log (req.end ());
+```
