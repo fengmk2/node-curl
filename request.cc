@@ -5,7 +5,7 @@
 #include <unistd.h>
 
 #define THROW_REQUEST_ALREADY_SEND \
-    ThrowException(Exception::TypeError(String::New("Request is already sent")))
+    ThrowException(Exception::Error(String::New("Request is already sent")))
 
 Request::Request ()
     : curl_ (curl_easy_init ()),
