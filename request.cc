@@ -1,9 +1,11 @@
 #include "curl.h"
 #include <iostream>
-#include <iterator>
 #include <utility>
 #include <string.h>
 #include <unistd.h>
+
+#define THROW_REQUEST_ALREADY_SEND \
+    ThrowException(Exception::TypeError(String::New("Request is already sent")))
 
 Request::Request ()
     : curl_ (curl_easy_init ()),
@@ -17,13 +19,12 @@ Request::Request ()
 
 Request::~Request () {
     if (curl_) curl_easy_cleanup (curl_);
-    std::cerr << ("Request destructor");
 }
 
-Handle<Value> Request::New (Handle<Object> options, bool raw) {
+Handle<Value> Request::New (Handle<Object> options) {
     HandleScope scope;
 
-    Handle<Object> handle = NewTemplate ()->NewInstance ();
+    Handle<Object> handle (NewTemplate ()->NewInstance ());
     Request *request = new Request ();
     request->Wrap (handle);
 
@@ -36,7 +37,7 @@ Handle<Value> Request::New (Handle<Object> options, bool raw) {
     if (!strcasecmp ("POST", *String::AsciiValue (method)))
         curl_easy_setopt (request->curl_, CURLOPT_POST, 1);
 
-    return scope.Close (handle);
+    return handle;
 }
 
 // request.write(chunk)
@@ -46,9 +47,11 @@ Handle<Value> Request::write (const Arguments& args) {
     if (args.Length () != 1 && !args[0]->IsString ())
         return THROW_BAD_ARGS;
 
-    Request *request = Unwrap<Request> (args.Holder ());
-    String::Utf8Value chunk (Handle<String>::Cast (args[0]));
+    Request *request = Unwrap (args.Holder ());
+    if (!request)
+        return THROW_REQUEST_ALREADY_SEND;
 
+    String::Utf8Value chunk (Handle<String>::Cast (args[0]));
     request->read_buffer_.insert (request->read_buffer_.end (),
                                   *chunk,
                                   *chunk + chunk.length ());
@@ -71,7 +74,9 @@ Handle<Value> Request::end (const Arguments& args) {
         Request::write (args);
     }
 
-    Request *request = Unwrap<Request> (args.Holder ());
+    Request *request = Unwrap (args.Holder ());
+    if (!request)
+        return THROW_REQUEST_ALREADY_SEND;
 
     // Must set file size
     curl_easy_setopt (request->curl_, CURLOPT_POSTFIELDSIZE, request->read_buffer_.size ());
@@ -84,6 +89,11 @@ Handle<Value> Request::end (const Arguments& args) {
 
     Handle<String> result = String::New (&request->write_buffer_[0],
                                          request->write_buffer_.size ());
+
+    // Request object is done now;
+    delete request;
+    args.Holder()->SetPointerInInternalField (0, NULL);
+
     return scope.Close (result);
 }
 
@@ -133,4 +143,12 @@ size_t Request::write_data (void *ptr, size_t size, size_t nmemb, void *userdata
                                    comein + size * nmemb);
 
     return size * nmemb;
+}
+
+Request* Request::Unwrap (v8::Handle<v8::Object> handle) {
+    return static_cast<Request*>(handle->GetPointerFromInternalField(0));
+}
+
+void Request::Wrap (v8::Handle<v8::Object> handle) {
+    handle->SetPointerInInternalField(0, this);
 }

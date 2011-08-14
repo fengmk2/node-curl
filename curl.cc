@@ -13,15 +13,26 @@ Handle<Value> NodeCurl::request (const Arguments& args) {
     if (args.Length () != 1 && !args[0]->IsObject ())
         return THROW_BAD_ARGS;
 
-    Handle<Object> options = Handle<Object>::Cast (args[0]);
-
-    return Request::New (scope.Close (options), true);
+    return Request::New (Handle<Object>::Cast (args[0]));
 }
 
-// curl.get (options[, data]);
-Handle<Value> NodeCurl::get (const Arguments&) {
+// curl.get (options | url);
+Handle<Value> NodeCurl::get (const Arguments& args) {
+    HandleScope scope;
 
-    return Undefined ();
+    if (args.Length () != 1)
+        return THROW_BAD_ARGS;
+
+    Handle<Object> options = Object::New ();
+    if (args[0]->IsString ()) {
+        options->Set (String::NewSymbol ("url"), args[0]);
+        options->Set (String::NewSymbol ("method"), String::New ("GET"));
+    } else {
+        options = Handle<Object>::Cast (args[0]);
+        options->Set (String::NewSymbol ("method"), String::New ("GET"));
+    }
+
+    return Request::New (options);
 }
 
 // curl.post (options[, data]);

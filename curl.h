@@ -19,12 +19,12 @@ class NodeCurl : public node::ObjectWrap {
 };
 
 // Request Object
-class Request : public node::ObjectWrap {
+class Request {
     public:
         Request ();
         ~Request ();
 
-        static Handle<Value> New (Handle<Object> options, bool raw = false);
+        static Handle<Value> New (Handle<Object>);
 
         // Public APIs
         // request.write(chunk)
@@ -44,6 +44,10 @@ class Request : public node::ObjectWrap {
         typedef std::vector<char> buffer_t;
         buffer_t read_buffer_, write_buffer_;
         size_t read_pos_;
+
+    protected:
+        static inline Request* Unwrap (v8::Handle<v8::Object> handle);
+        inline void Wrap (v8::Handle<v8::Object> handle);
 };
 
 #define THROW_BAD_ARGS \
