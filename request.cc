@@ -2,6 +2,10 @@
 #include <iostream>
 #include <utility>
 #include <string.h>
+#include <stdio.h>
+#include <errno.h>
+#include <sys/types.h>
+#include <sys/stat.h>
 #include <unistd.h>
 #include <node_buffer.h>
 
@@ -12,8 +16,6 @@ Request::Request ()
     : curl_ (curl_easy_init ()),
       read_pos_ (0)
 {
-    curl_easy_setopt (curl_, CURLOPT_READFUNCTION, read_data);
-    curl_easy_setopt (curl_, CURLOPT_READDATA, this);
     curl_easy_setopt (curl_, CURLOPT_WRITEFUNCTION, write_data);
     curl_easy_setopt (curl_, CURLOPT_WRITEDATA, this);
 }
@@ -81,7 +83,7 @@ Handle<Value> Request::write (const Arguments& args) {
         return THROW_REQUEST_ALREADY_SEND;
 
     if (args[0]->IsString ()) {
-        String::Utf8Value chunk (Handle<String>::Cast (args[0]));
+        String::Utf8Value chunk (args[0]);
         request->read_buffer_.insert (request->read_buffer_.end (),
                                       *chunk,
                                       *chunk + chunk.length ());
@@ -120,6 +122,9 @@ Handle<Value> Request::end (const Arguments& args) {
 
     // Must set file size
     curl_easy_setopt (request->curl_, CURLOPT_POSTFIELDSIZE, request->read_buffer_.size ());
+    // Set read functions
+    curl_easy_setopt (request->curl_, CURLOPT_READFUNCTION, read_data);
+    curl_easy_setopt (request->curl_, CURLOPT_READDATA, request);
 
     // Send them all!
     CURLcode res = curl_easy_perform (request->curl_);
@@ -139,8 +144,46 @@ Handle<Value> Request::end (const Arguments& args) {
 
 // request.endFile(filename)
 Handle<Value> Request::endFile (const Arguments& args) {
+    HandleScope scope;
 
-    return Undefined ();
+    if (args.Length () != 1 && !args[0]->IsString ())
+        return THROW_BAD_ARGS;
+
+    Request *request = Unwrap (args.Holder ());
+    if (!request)
+        return THROW_REQUEST_ALREADY_SEND;
+
+    // Prepare file
+    String::Utf8Value path(args[0]);
+    struct stat buf;
+    if (stat (*path, &buf) == -1)
+        return ThrowException(Exception::Error(String::New(strerror (errno))));
+
+    FILE *file = fopen (*path, "r");
+    if (!file) 
+        return ThrowException(Exception::Error(String::New(strerror (errno))));
+    curl_easy_setopt (request->curl_, CURLOPT_POST, 1);
+    curl_easy_setopt (request->curl_, CURLOPT_READDATA, file);
+
+    // Must set file size
+    curl_easy_setopt (request->curl_, CURLOPT_POSTFIELDSIZE, buf.st_size);
+
+    // Send them all!
+    CURLcode res = curl_easy_perform (request->curl_);
+    if (CURLE_OK != res) {
+        return ThrowException (Exception::Error (
+                    String::New (curl_easy_strerror (res))));
+    }
+
+    Handle<Object> result = request->GetResult ();
+
+    fclose (file);
+
+    // Request object is done now;
+    delete request;
+    args.Holder()->SetPointerInInternalField (0, NULL);
+
+    return scope.Close (result);
 }
 
 Handle<ObjectTemplate> Request::NewTemplate () {
@@ -148,8 +191,9 @@ Handle<ObjectTemplate> Request::NewTemplate () {
 
     Handle<ObjectTemplate> tpl = ObjectTemplate::New ();
     tpl->SetInternalFieldCount (1);
-    NODE_SET_METHOD (tpl , "write" , Request::write);
-    NODE_SET_METHOD (tpl , "end"   , Request::end);
+    NODE_SET_METHOD (tpl , "write"   , Request::write);
+    NODE_SET_METHOD (tpl , "end"     , Request::end);
+    NODE_SET_METHOD (tpl , "endFile" , Request::endFile);
 
     return scope.Close (tpl);
 }

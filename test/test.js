@@ -235,6 +235,22 @@ request11.finish();
 
 //-------------------------------------------------------------------------
 
+var request12 = new testy({
+    expected : 1,
+    name : 'request.endFile'
+});
+
+var req = curl.request ({
+    url: "http://localhost:9000"
+});
+var res = req.endFile (__filename);
+
+request12.assert.equal (res.data.toString ("utf8"),
+	   	"POST\n" + require("fs").readFileSync (__filename));
+request12.finish();
+
+//-------------------------------------------------------------------------
+
 var get1 = new testy({
     expected : 3,
     name : 'Empty get'

@@ -1,10 +1,8 @@
 # node-curl
   
  node-curl is a port of libcurl to node.js. Its interface emulates the
- `http` module of node.js. 
-
- But in contrast to `http` module's asynchronous functions, node-curl
- provides the equivalent synchronous APIs.
+ `http` module of node.js. But in contrast to `http` module's asynchronous
+ functions, node-curl provides the equivalent synchronous APIs.
 
 ## Build
   
@@ -71,3 +69,26 @@ req.write ("Some text\n");
 req.write ("another text");
 console.log (req.end ());
 ```
+
+### request.endFile (filePath)
+
+ Send a file directly. The method will be `POST` however your `options` is.
+
+ Example
+
+```javascript
+var req = curl.request ({
+    url: "http://cnodejs.org",
+});
+req.endFile ("/etc/passwd");
+```
+
+### response
+
+ The response Object is what you get after req.end (), it has following
+ fields:
+
+ - `data`        A Buffer that stores data sent by server.
+ - `headers`     Response headers.
+ - `statusCode`  Status code that sent by server.
+
