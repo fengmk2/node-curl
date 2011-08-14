@@ -16,10 +16,9 @@
  
  Options:
 
- - `url` The url to GET/POST, such as "http://host:80/index.php", just like
-   what you input in the browser.
- - `method` `GET` or `POST`
- - `useragent` The User Agent string
+ - `url`        The url to GET/POST, such as "http://host:80/index.php", just like what you input in the browser.
+ - `method`     `GET` or `POST`
+ - `useragent`  The User Agent string
 
  Example
 
