@@ -3,6 +3,7 @@
 #include <utility>
 #include <string.h>
 #include <unistd.h>
+#include <node_buffer.h>
 
 #define THROW_REQUEST_ALREADY_SEND \
     ThrowException(Exception::Error(String::New("Request is already sent")))
@@ -157,8 +158,6 @@ Handle<Object> Request::GetResult () const {
     Handle<Object> result = Object::New ();
     result->Set (String::NewSymbol ("statusCode"), Integer::New (statusCode));
     result->Set (String::NewSymbol ("ip"), String::New (ip));
-    result->Set (String::NewSymbol ("data"), 
-            String::New (&write_buffer_[0], write_buffer_.size ()));
     Handle<Object> headers = Object::New ();
     result->Set (String::NewSymbol ("headers"), headers);
     if (content_type) {
@@ -169,6 +168,10 @@ Handle<Object> Request::GetResult () const {
         headers->Set (String::NewSymbol ("content-length"),
                       Integer::New ((long) content_length));
     }
+
+    // Set data as Buffer
+    result->Set (String::NewSymbol ("data"), node::Buffer::New (
+                String::New (&write_buffer_[0], write_buffer_.size ())));
 
     return scope.Close (result);
 }

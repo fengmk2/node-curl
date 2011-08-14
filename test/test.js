@@ -194,6 +194,21 @@ request9.finish();
 
 //-------------------------------------------------------------------------
 
+var request10 = new testy({
+    expected : 1,
+    name : 'response.data should be of Buffer'
+});
+
+var req = curl.request ({
+    url: "http://localhost:9000"
+});
+var res = req.end ();
+
+request10.assert.ok (res.data instanceof Buffer);
+request10.finish();
+
+//-------------------------------------------------------------------------
+
 var get1 = new testy({
     expected : 3,
     name : 'Empty get'
