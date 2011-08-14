@@ -8,7 +8,7 @@
 
 ## Build
   
- node-waf configure && node-waf build
+   node-waf configure && node-waf build
 
 ## APIs
 
@@ -22,20 +22,29 @@
  - `useragent` The User Agent string
 
  Example
-   var req = curl.request ({
-       url: "http://cnodejs.org",
-       method: "GET"
-   });
+
+     ```javascript
+     var req = curl.request ({
+         url: "http://cnodejs.org",
+         method: "GET"
+     });
+     ```
 
 ### curl.get ([options | url])
 
  It's equivalent to `curl.request` but the method is default to `GET`.
 
  And you can have
-   var req = curl.get ({ url : "http://cnodejs.org"});
+
+     ```javascript
+     var req = curl.get ({ url : "http://cnodejs.org"});
+     ```
 
  Or just straight forward
-   var req = curl.get ("http://cnodejs.org");
+
+     ```javascript
+     var req = curl.get ("http://cnodejs.org");
+     ```
 
 ### request.write (data)
  
@@ -46,11 +55,14 @@
  Send the request and get response.
 
  Example
-   var req = curl.request ({
-       url: "http://cnodejs.org",
-       method: "POST"
-   });
-   req.write ("Some text\n");
-   req.write ("another text");
-   console.log (req.end ());
+
+ ```javascript
+     var req = curl.request ({
+         url: "http://cnodejs.org",
+         method: "POST"
+     });
+     req.write ("Some text\n");
+     req.write ("another text");
+     console.log (req.end ());
+ ```
 
