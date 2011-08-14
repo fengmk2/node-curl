@@ -35,3 +35,14 @@ req.write ("1 line\n");
 req.write ("2 line\n");
 req.write ("3 line\n");
 console.log (req.end ("hello world"));
+
+console.log ("Single get method");
+req = curl.get ({
+    url: "http://localhost:9000",
+});
+console.log (req.end ());
+
+console.log ("Single get method in string");
+req = curl.get ("http://localhost:9000");
+console.log (req.end ());
+

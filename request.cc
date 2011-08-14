@@ -9,6 +9,7 @@
 
 Request::Request ()
     : curl_ (curl_easy_init ()),
+      is_post_ (false),
       read_pos_ (0)
 {
     curl_easy_setopt (curl_, CURLOPT_READFUNCTION, read_data);
@@ -34,8 +35,10 @@ Handle<Value> Request::New (Handle<Object> options) {
     // options.url
     curl_easy_setopt (request->curl_, CURLOPT_URL, *String::Utf8Value (url));
     // options.method
-    if (!strcasecmp ("POST", *String::AsciiValue (method)))
+    if (!strcasecmp ("POST", *String::AsciiValue (method))) {
+        request->is_post_ = true;
         curl_easy_setopt (request->curl_, CURLOPT_POST, 1);
+    }
 
     return handle;
 }
@@ -79,7 +82,9 @@ Handle<Value> Request::end (const Arguments& args) {
         return THROW_REQUEST_ALREADY_SEND;
 
     // Must set file size
-    curl_easy_setopt (request->curl_, CURLOPT_POSTFIELDSIZE, request->read_buffer_.size ());
+    if (request->is_post_)
+        curl_easy_setopt (request->curl_, CURLOPT_POSTFIELDSIZE, request->read_buffer_.size ());
+
     // Send them all!
     CURLcode res = curl_easy_perform (request->curl_);
     if (CURLE_OK != res) {
@@ -87,8 +92,7 @@ Handle<Value> Request::end (const Arguments& args) {
                     String::New (curl_easy_strerror (res))));
     }
 
-    Handle<String> result = String::New (&request->write_buffer_[0],
-                                         request->write_buffer_.size ());
+    Handle<Object> result = request->GetResult ();
 
     // Request object is done now;
     delete request;
@@ -112,6 +116,37 @@ Handle<ObjectTemplate> Request::NewTemplate () {
     NODE_SET_METHOD (tpl , "end"   , Request::end);
 
     return scope.Close (tpl);
+}
+
+Handle<Object> Request::GetResult () const {
+    HandleScope scope;
+
+    long statusCode;
+    curl_easy_getinfo (curl_, CURLINFO_RESPONSE_CODE, &statusCode);
+    const char *content_type;
+    curl_easy_getinfo (curl_, CURLINFO_CONTENT_TYPE, &content_type);
+    double content_length;
+    curl_easy_getinfo (curl_, CURLINFO_CONTENT_LENGTH_DOWNLOAD, &content_length);
+    const char *ip;
+    curl_easy_getinfo (curl_, CURLINFO_PRIMARY_IP, &ip);
+
+    Handle<Object> result = Object::New ();
+    result->Set (String::NewSymbol ("statusCode"), Integer::New (statusCode));
+    result->Set (String::NewSymbol ("ip"), String::New (ip));
+    result->Set (String::NewSymbol ("data"), 
+            String::New (&write_buffer_[0], write_buffer_.size ()));
+    Handle<Object> headers = Object::New ();
+    result->Set (String::NewSymbol ("headers"), headers);
+    if (content_type) {
+        headers->Set (String::NewSymbol ("content-type"),
+                      String::New (content_type));
+    }
+    if (content_length > -1) {
+        headers->Set (String::NewSymbol ("content-length"),
+                      Integer::New ((long) content_length));
+    }
+
+    return scope.Close (result);
 }
 
 size_t Request::read_data (void *ptr, size_t size, size_t nmemb, void *userdata) {
