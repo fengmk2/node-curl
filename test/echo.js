@@ -1,4 +1,12 @@
 require("http").createServer(function (req, res) {
+  if (req.headers["timeout"]) {
+      setTimeout (function () {
+          res.end ();
+      }, 60000);
+
+      return;
+  }
+
   if (req.method == "HEAD") {
     res.writeHead(200, {
         'Content-Type'  : 'text/plain',

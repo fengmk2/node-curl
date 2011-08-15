@@ -14,11 +14,13 @@
  
  Options:
 
- - `url`        (required) The url to GET/POST, such as "http://host:80/index.php", just like what you input in the browser.
- - `method`     `GET`, `POST` or `HEAD` or any other valid request. And even `FUCK` if your server supports it.
- - `headers`    Custom headers to be sent. 
- - `useragent`  The User Agent string
- - `debug`      node-curl will print debug informations is set to true
+ - `url`             (required) The url to GET/POST, such as "http://host:80/index.php", just like what you input in the browser.
+ - `method`          `GET`, `POST` or `HEAD` or any other valid request. And even `FUCK` if your server supports it.
+ - `headers`         Custom headers to be sent. 
+ - `useragent`       The User Agent string
+ - `timeout`         Maximum time in seconds that you allow the libcurl transfer operation to take.
+ - `connectTimeout`  Maximum time in seconds that you allow the connection to the server to take.
+ - `debug`           node-curl will print debug informations is set to true
 
  Example
 

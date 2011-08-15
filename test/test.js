@@ -348,3 +348,23 @@ error2.assert.throws (
     "Server returned nothing"
 );
 error2.finish ();
+
+//-------------------------------------------------------------------------
+
+var error3 = new testy({
+    expected : 1,
+    name : 'should throw when timeout transfering'
+});
+
+error3.assert.throws (
+    function () {
+        var req = curl.request ({
+            url: "http://localhost:9000",
+            timeout: 1,
+            headers: { "timeout": "true" }
+        });
+        var data = req.end ();
+    },
+    "Timeout was reached"
+);
+error3.finish ();

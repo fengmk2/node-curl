@@ -79,6 +79,16 @@ Handle<Value> Request::New (Handle<Object> options) {
 
         request->AddHeaders (Handle<Object>::Cast (headers));
     }
+    // options.timeout
+    if (options->Has (String::New ("timeout"))) {
+        long timeout = options->Get (String::New ("timeout"))->IntegerValue ();
+        curl_easy_setopt (request->curl_, CURLOPT_TIMEOUT, timeout);
+    }
+    // options.connectTimeout
+    if (options->Has (String::New ("connectTimeout"))) {
+        long timeout = options->Get (String::New ("connectTimeout"))->IntegerValue ();
+        curl_easy_setopt (request->curl_, CURLOPT_CONNECTTIMEOUT, timeout);
+    }
 
     return handle;
 }
