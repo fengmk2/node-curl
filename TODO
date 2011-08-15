@@ -1,1 +1,2 @@
-Add curl.post (options, data)
+We should explictly clean the Request object when throwing javascript exceptions.
+Add curl.post (options, data).
