@@ -225,7 +225,7 @@ request11.finish();
 //-------------------------------------------------------------------------
 
 var request12 = new testy({
-    expected : 1,
+    expected : 2,
     name : 'request.endFile'
 });
 
@@ -234,7 +234,15 @@ var req = curl.request ({
 });
 var res = req.endFile (__filename);
 
+var req2 = curl.request ({
+    url: "http://localhost:9000",
+    method: "POST"
+});
+var res2 = req2.endFile (__filename);
+
 request12.assert.equal (res.data.toString ("utf8"),
+	   	"PUT\n" + require("fs").readFileSync (__filename));
+request12.assert.equal (res2.data.toString ("utf8"),
 	   	"POST\n" + require("fs").readFileSync (__filename));
 request12.finish();
 
@@ -256,6 +264,24 @@ var data = req.end ();
 request13.assert.equal (data.headers["customheaders"], "Test String");
 request13.assert.equal (data.statusCode, 42);
 request13.finish();
+
+//-------------------------------------------------------------------------
+
+var request14 = new testy({
+    expected : 1,
+    name : 'request with PUT with data'
+});
+
+var data = new Buffer('abc');
+var req = curl.request ({
+    url: "http://localhost:9000",
+    headers: { "custom": "true" },
+    method: "PUT"
+});
+var res = req.end (data);
+
+request14.assert.equal ('PUT\n' + '{"user-agent":"zcbenz/node-curl","host":"localhost:9000","accept":"*/*","custom":"true","content-length":"3","expect":"100-continue"}' + 'abc', res.data);
+request14.finish ();
 
 //-------------------------------------------------------------------------
 

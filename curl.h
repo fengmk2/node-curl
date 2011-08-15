@@ -47,6 +47,9 @@ class Request {
         // Parse headers to object
         Handle<Object> ParseHeaders () const;
 
+        // Set content-length according to method
+        void SetContentLength (size_t) const;
+
         // Callbacks with curl
         static size_t read_data (void *ptr, size_t size, size_t nmemb, void *userdata);
         static size_t write_data (void *ptr, size_t size, size_t nmemb, void *userdata);
@@ -55,6 +58,9 @@ class Request {
         typedef std::vector<char> buffer_t;
         buffer_t read_buffer_, write_buffer_, header_buffer_;
         size_t read_pos_;
+
+        enum { METHOD_LEN = 64 };
+        char method_[METHOD_LEN];
 
     protected:
         static inline Request* Unwrap (v8::Handle<v8::Object> handle);

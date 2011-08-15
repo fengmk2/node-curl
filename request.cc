@@ -20,9 +20,12 @@ Request::Request ()
     : curl_ (curl_easy_init ()),
       read_pos_ (0)
 {
+    method_[0] = 0;
+
     curl_easy_setopt (curl_, CURLOPT_WRITEFUNCTION, write_data);
     curl_easy_setopt (curl_, CURLOPT_WRITEDATA, &write_buffer_);
     curl_easy_setopt (curl_, CURLOPT_HEADERDATA, &header_buffer_);
+    curl_easy_setopt (curl_, CURLOPT_NOSIGNAL, 1);
 }
 
 Request::~Request () {
@@ -43,12 +46,16 @@ Handle<Value> Request::New (Handle<Object> options) {
     // options.method
     if (options->Has (String::New ("method"))) {
         String::AsciiValue method (options->Get (String::New ("method")));
+        strncpy (request->method_, *method, Request::METHOD_LEN);
+
         if (!strcasecmp ("POST", *method)) {
             curl_easy_setopt (request->curl_, CURLOPT_POST, 1);
         } else if (!strcasecmp ("GET", *method)) {
             curl_easy_setopt (request->curl_, CURLOPT_HTTPGET, 1);
         } else if (!strcasecmp ("HEAD", *method)) {
             curl_easy_setopt (request->curl_, CURLOPT_NOBODY, 1);
+        } else if (!strcasecmp ("PUT", *method)) {
+            curl_easy_setopt (request->curl_, CURLOPT_UPLOAD, 1);
         } else {
             curl_easy_setopt (request->curl_, CURLOPT_CUSTOMREQUEST, *method);
         }
@@ -126,7 +133,7 @@ Handle<Value> Request::end (const Arguments& args) {
         return THROW_REQUEST_ALREADY_SEND;
 
     // Must set file size
-    curl_easy_setopt (request->curl_, CURLOPT_POSTFIELDSIZE, request->read_buffer_.size ());
+    request->SetContentLength (request->read_buffer_.size ());
     // Set read functions
     curl_easy_setopt (request->curl_, CURLOPT_READFUNCTION, read_data);
     curl_easy_setopt (request->curl_, CURLOPT_READDATA, request);
@@ -167,11 +174,16 @@ Handle<Value> Request::endFile (const Arguments& args) {
     FILE *file = fopen (*path, "r");
     if (!file) 
         return ThrowException(Exception::Error(String::New(strerror (errno))));
-    curl_easy_setopt (request->curl_, CURLOPT_POST, 1);
     curl_easy_setopt (request->curl_, CURLOPT_READDATA, file);
 
+    // method is default to `PUT`
+    if (0 == *request->method_) {
+        strcpy (request->method_, "PUT");
+        curl_easy_setopt (request->curl_, CURLOPT_UPLOAD, 1);
+    }
+
     // Must set file size
-    curl_easy_setopt (request->curl_, CURLOPT_POSTFIELDSIZE, buf.st_size);
+    request->SetContentLength (buf.st_size);
 
     // Send them all!
     CURLcode res = curl_easy_perform (request->curl_);
@@ -279,6 +291,15 @@ Handle<Object> Request::ParseHeaders () const {
     }
 
     return scope.Close (headers);
+}
+
+void Request::SetContentLength (size_t size) const {
+    if (!strcasecmp (method_, "PUT")) {
+        curl_easy_setopt (curl_, CURLOPT_INFILESIZE_LARGE,
+                static_cast<curl_off_t> (size));
+    } else {
+        curl_easy_setopt (curl_, CURLOPT_POSTFIELDSIZE, size);
+    }
 }
 
 size_t Request::read_data (void *ptr, size_t size, size_t nmemb, void *userdata) {

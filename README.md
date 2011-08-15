@@ -72,7 +72,7 @@ console.log (req.end ());
 
 ### request.endFile (filePath)
 
- Send a file directly. The method will be `POST` however your `options` is.
+ Send a file directly. The method will default to `PUT`.
 
  Example
 
