@@ -1,5 +1,5 @@
 var testy = require('./lib.js');
-var curl = require ("../node_curl");
+var curl = require ("../");
 
 //-------------------------------------------------------------------------
 

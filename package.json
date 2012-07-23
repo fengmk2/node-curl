@@ -1,5 +1,23 @@
 {
-    "name": "node-curl"
-  , "version": "0.0.1"
-  , "private": false
+  "name": "httpsync",
+  "version": "0.0.1",
+  "scripts": {
+    "install": "node-waf clean ; node-waf configure build"
+  },
+  "description": "node-curl is a port of libcurl to node.js. Its interface emulates the  `http` module of node.js. But in contrast to `http` module's asynchronous  functions, node-curl provides the equivalent synchronous APIs.",
+  "main": "index.js",
+  "directories": {
+    "test": "test"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git://github.com/zcbenz/node-curl.git"
+  },
+  "keywords": [
+    "curl",
+    "sync",
+    "http"
+  ],
+  "author": "zcbenz",
+  "license": "MIT"
 }

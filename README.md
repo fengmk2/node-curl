@@ -4,6 +4,12 @@
  `http` module of node.js. But in contrast to `http` module's asynchronous
  functions, node-curl provides the equivalent synchronous APIs.
 
+## Install
+
+```bash
+$ npm install httpsync
+```
+
 ## Build
   
     node-waf configure && node-waf build
@@ -25,14 +31,14 @@
  Example
 
 ```javascript
-var req = curl.request ({
-    url: "http://cnodejs.org",
-    method: "GET",
-    useragent: "Ultimate Web Browser",
-    headers: {
-        "Tag": "TGB3123",
-        "String": "A long string"
-    }
+var req = curl.request({
+  url: "http://cnodejs.org",
+  method: "GET",
+  useragent: "Ultimate Web Browser",
+  headers: {
+    Tag: "TGB3123",
+    String: "A long string"
+  }
 });
 ```
 
@@ -43,13 +49,13 @@ var req = curl.request ({
  And you can have
 
 ```javascript
-var req = curl.get ({ url : "http://cnodejs.org"});
+var req = curl.get({ url : "http://cnodejs.org"});
 ```
 
  Or just straight forward
 
 ```javascript
-var req = curl.get ("http://cnodejs.org");
+var req = curl.get("http://cnodejs.org");
 ```
 
 ### request.write (chunk)
@@ -63,13 +69,13 @@ var req = curl.get ("http://cnodejs.org");
  Example
 
 ```javascript
-var req = curl.request ({
-    url: "http://cnodejs.org",
-    method: "POST"
+var req = curl.request({
+  url: "http://cnodejs.org",
+  method: "POST"
 });
-req.write ("Some text\n");
-req.write ("another text");
-console.log (req.end ());
+req.write("Some text\n");
+req.write("another text");
+console.log(req.end());
 ```
 
 ### request.endFile (filePath)
@@ -79,10 +85,10 @@ console.log (req.end ());
  Example
 
 ```javascript
-var req = curl.request ({
-    url: "http://cnodejs.org",
+var req = curl.request({
+  url: "http://cnodejs.org",
 });
-req.endFile ("/etc/passwd");
+req.endFile("/etc/passwd");
 ```
 
 ### response
