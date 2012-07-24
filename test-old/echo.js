@@ -1,4 +1,5 @@
 require("http").createServer(function (req, res) {
+  // console.log(req.url, req.headers);
   if (req.headers["timeout"]) {
       setTimeout (function () {
           res.end ();
@@ -41,3 +42,13 @@ require("http").createServer(function (req, res) {
       res.end(data);
   });
 }).listen(9000);
+
+// Can not curl same process http server ?!
+// 
+// setTimeout(function () {
+//   console.log('start request');
+//   var req = require('../').get('http://localhost:9000');
+//   console.log(req);
+//   var res = req.end();
+//   console.log(res);
+// }, 1000);

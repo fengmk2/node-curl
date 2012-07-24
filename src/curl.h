@@ -68,6 +68,9 @@ class Request {
 };
 
 #define THROW_BAD_ARGS \
-    ThrowException(Exception::TypeError(String::New("Bad argument")))
+    ThrowException(Exception::TypeError(String::New("Bad arguments")))
+
+#define THROW_TYPE_ERROR(msg) \
+    ThrowException(Exception::TypeError(String::New(msg)))
 
 #endif /* end of CURL_H */

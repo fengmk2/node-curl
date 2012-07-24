@@ -41,6 +41,7 @@ Handle<Value> Request::New (Handle<Object> options) {
 
     // Set options
     Handle<Value> url    = options->Get (String::New ("url"));
+    
     // options.url
     curl_easy_setopt (request->curl_, CURLOPT_URL, *String::Utf8Value (url));
     // options.method
