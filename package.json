@@ -2,7 +2,7 @@
   "name": "httpsync",
   "version": "0.0.1",
   "scripts": {
-    "install": "node-waf clean ; node-waf configure build"
+    "install": "node-gyp clean && node-gyp configure && node-gyp build"
   },
   "description": "node-curl is a port of libcurl to node.js. Its interface emulates the  `http` module of node.js. But in contrast to `http` module's asynchronous  functions, node-curl provides the equivalent synchronous APIs.",
   "main": "index.js",
@@ -18,6 +18,10 @@
     "sync",
     "http"
   ],
+  "devDependencies": {
+    "should": "*",
+    "mocha": "*"
+  },
   "author": "zcbenz",
   "license": "MIT"
 }
