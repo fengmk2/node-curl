@@ -8,6 +8,8 @@ functions, node-curl provides the equivalent synchronous APIs.
 
 ## Install
 
+* required libcurl: http://curl.haxx.se/libcurl/
+
 ```bash
 $ npm install httpsync
 ```
