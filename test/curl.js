@@ -278,7 +278,12 @@ describe('curl.js', function () {
     });
 
     it('should GET / return status 200 using normal http module', function (done) {
-      require('http').get(homeurl, function (res) {
+      var info = require('url').parse(homeurl);
+      require('http').get({
+        host: info.hostname,
+        port: info.port,
+        path: info.path
+      }, function (res) {
         res.should.status(200);
         done();
       });
