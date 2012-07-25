@@ -2,7 +2,8 @@
   "name": "httpsync",
   "version": "0.0.1",
   "scripts": {
-    "install": "node-gyp clean && node-gyp configure && node-gyp build"
+    "install": "node-gyp clean configure build",
+    "test": "make test"
   },
   "description": "node-curl is a port of libcurl to node.js. Its interface emulates the  `http` module of node.js. But in contrast to `http` module's asynchronous  functions, node-curl provides the equivalent synchronous APIs.",
   "main": "index.js",
@@ -11,7 +12,7 @@
   },
   "repository": {
     "type": "git",
-    "url": "git://github.com/zcbenz/node-curl.git"
+    "url": "git://github.com/fengmk2/node-curl.git"
   },
   "keywords": [
     "curl",

@@ -1,18 +1,16 @@
-# node-curl
-  
- node-curl is a port of libcurl to node.js. Its interface emulates the
- `http` module of node.js. But in contrast to `http` module's asynchronous
- functions, node-curl provides the equivalent synchronous APIs.
+# httpsync
+
+[![Build Status](https://secure.travis-ci.org/fengmk2/node-curl.png)](http://travis-ci.org/fengmk2/node-curl)
+
+`httpsync` is a port of libcurl to node.js. Its interface emulates the
+`http` module of node.js. But in contrast to `http` module's asynchronous
+functions, node-curl provides the equivalent synchronous APIs.
 
 ## Install
 
 ```bash
 $ npm install httpsync
 ```
-
-## Build
-  
-    node-waf configure && node-waf build
 
 ## APIs
 
@@ -78,7 +76,7 @@ req.write("another text");
 console.log(req.end());
 ```
 
-### request.endFile (filePath)
+### request.endFile(filePath)
 
  Send a file directly. The method will default to `PUT`.
 
@@ -100,6 +98,22 @@ req.endFile("/etc/passwd");
  - `headers`     Complete response headers, even contains those custom ones.
  - `ip`          IP address of the server.
  - `statusCode`  Status code that sent by server.
+
+## Contributors
+
+Thanks goes to the people who have contributed code to this module, see the [GitHub Contributors page](https://github.com/fengmk2/node-curl/graphs/contributors).
+
+Below is the output from `git-summary`
+
+```
+ project: node-curl
+ commits: 25
+ active : 5 days
+ files  : 21
+ authors: 
+    21  赵成                  84.0%
+     4  fengmk2                 16.0%
+```
 
 ## License 
 
