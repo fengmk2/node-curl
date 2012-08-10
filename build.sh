@@ -1,3 +1,4 @@
+mkdir -p deps
 cd deps
 rm -rf curl
 curl -o curl-7.27.0.tar.gz http://curl.haxx.se/download/curl-7.27.0.tar.gz
@@ -22,4 +23,4 @@ gcc -o build/Release/node_curl.node build/Release/obj.target/node_curl/src/curl.
   build/Release/obj.target/node_curl/src/request.o \
   "deps/curl/lib/.libs/libcurl.a" -shared $EXTRA_FLAG
 
-rm -rf deps/*
+rm -rf deps
