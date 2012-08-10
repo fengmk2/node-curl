@@ -114,12 +114,12 @@ Below is the output from `git-summary`
 
 ```
  project: node-curl
- commits: 25
- active : 5 days
- files  : 21
+ commits: 33
+ active : 8 days
+ files  : 24
  authors: 
-    21  赵成                  84.0%
-     4  fengmk2                 16.0%
+    21  赵成                  63.6%
+    12  fengmk2                 36.4%
 ```
 
 ## License 
