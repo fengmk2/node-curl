@@ -8,8 +8,11 @@
         "src/curl.cc",
         "src/request.cc"
       ],
+      "include_dirs": [
+        "${PWD}/deps/curl-7.27.0/include"
+      ],
       "libraries": [
-        "-lcurl"
+        "-L${PWD}/deps/curl-7.27.0/lib -lcurl"
       ]
     }
   ]

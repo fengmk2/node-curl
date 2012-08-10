@@ -1,8 +1,8 @@
 {
   "name": "httpsync",
-  "version": "0.0.3",
+  "version": "0.0.4",
   "scripts": {
-    "install": "node-gyp rebuild",
+    "install": "sh build.sh",
     "test": "make test"
   },
   "description": "`httpsync` is a port of libcurl to node.js. Its interface emulates the  `http` module of node.js. But in contrast to `http` module's asynchronous functions, `httpsync` provides the equivalent synchronous APIs.",

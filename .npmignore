@@ -1,0 +1,4 @@
+build/
+deps/curl-7.27.0/
+test-old/
+
