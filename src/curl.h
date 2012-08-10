@@ -3,7 +3,7 @@
 
 #include <v8.h>
 #include <node.h>
-#include <curl/curl.h>
+#include "curl/curl.h"
 #include <vector>
 using namespace v8;
 

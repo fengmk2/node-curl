@@ -1,4 +1,4 @@
-#include "curl.h"
+#include "./curl.h"
 
 extern "C" {
 static void init (Handle<Object> target)

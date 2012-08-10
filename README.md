@@ -16,7 +16,7 @@ $ npm install httpsync
 
 ## APIs
 
-### curl.request(options)
+### httpsync.request(options)
  
  Options:
 
@@ -26,12 +26,13 @@ $ npm install httpsync
  - `useragent`       The User Agent string
  - `timeout`         Maximum time in seconds that you allow the libcurl transfer operation to take.
  - `connectTimeout`  Maximum time in seconds that you allow the connection to the server to take.
- - `debug`           node-curl will print debug informations is set to true
+ - `debug`           `httpsync` will print debug informations is set to true
 
  Example
 
 ```javascript
-var req = curl.request({
+var httpsync = require('httpsync');
+var req = httpsync.request({
   url: "http://cnodejs.org",
   method: "GET",
   useragent: "Ultimate Web Browser",
@@ -42,20 +43,24 @@ var req = curl.request({
 });
 ```
 
-### curl.get([options | url])
+### httpsync.get([options | url])
 
  It's equivalent to `curl.request` but the method is default to `GET`.
 
  And you can have
 
 ```javascript
-var req = curl.get({ url : "http://cnodejs.org"});
+var httpsync = require('httpsync');
+var req = httpsync.get({ url : "http://cnodejs.org"});
+var res = req.end();
+console.log(res);
 ```
 
  Or just straight forward
 
 ```javascript
-var req = curl.get("http://cnodejs.org");
+var httpsync = require('httpsync');
+var req = httpsync.get("http://cnodejs.org");
 ```
 
 ### request.write(chunk)

@@ -9,10 +9,7 @@
         "src/request.cc"
       ],
       "include_dirs": [
-        "${PWD}/deps/curl-7.27.0/include"
-      ],
-      "libraries": [
-        "-L${PWD}/deps/curl-7.27.0/lib -lcurl"
+        "${PWD}/deps/curl/include"
       ]
     }
   ]

@@ -1,4 +1,4 @@
-#include "curl.h"
+#include "./curl.h"
 
 void NodeCurl::Init(Handle<Object> target) {
   target->Set(String::NewSymbol("request"),
