@@ -1,6 +1,6 @@
 {
   "name": "httpsync",
-  "version": "0.0.4",
+  "version": "0.0.5",
   "scripts": {
     "install": "sh build.sh",
     "test": "make test"
