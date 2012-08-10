@@ -7,9 +7,6 @@
         "src/main.cc",
         "src/curl.cc",
         "src/request.cc"
-      ],
-      "include_dirs": [
-        "${PWD}/deps/curl/include"
       ]
     }
   ]
