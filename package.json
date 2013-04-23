@@ -1,6 +1,6 @@
 {
   "name": "httpsync",
-  "version": "0.0.5",
+  "version": "0.0.7",
   "scripts": {
     "install": "sh build.sh",
     "test": "make test"
@@ -21,7 +21,8 @@
   ],
   "devDependencies": {
     "should": "*",
-    "mocha": "*"
+    "mocha": "*",
+    "form-data": "0.0.3"
   },
   "author": "zcbenz",
   "license": "MIT"
