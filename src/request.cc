@@ -241,7 +241,7 @@ Handle<Object> Request::GetResult () const {
 
     // Set data as Buffer
     result->Set (String::NewSymbol ("data"), node::Buffer::New (
-                String::New (&write_buffer_[0], write_buffer_.size ())));
+                &write_buffer_[0], write_buffer_.size ())->handle_);
 
     return scope.Close (result);
 }
