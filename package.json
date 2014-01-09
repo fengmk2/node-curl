@@ -1,6 +1,6 @@
 {
   "name": "httpsync",
-  "version": "0.0.7",
+  "version": "0.0.8",
   "scripts": {
     "install": "sh build.sh",
     "test": "make test"
@@ -10,6 +10,7 @@
   "directories": {
     "test": "test"
   },
+  "homepage": "https://github.com/fengmk2/node-curl",
   "repository": {
     "type": "git",
     "url": "git://github.com/fengmk2/node-curl.git"
@@ -20,6 +21,7 @@
     "http"
   ],
   "devDependencies": {
+    "contributors": "*",
     "should": "*",
     "mocha": "*",
     "form-data": "0.0.3"
