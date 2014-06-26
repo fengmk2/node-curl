@@ -26,6 +26,8 @@ Request::Request ()
     curl_easy_setopt (curl_, CURLOPT_WRITEDATA, &write_buffer_);
     curl_easy_setopt (curl_, CURLOPT_HEADERDATA, &header_buffer_);
     curl_easy_setopt (curl_, CURLOPT_NOSIGNAL, 1);
+    curl_easy_setopt (curl_, CURLOPT_FOLLOWLOCATION, 1);
+    curl_easy_setopt (curl_, CURLOPT_MAXREDIRS, 5);
 }
 
 Request::~Request () {
