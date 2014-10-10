@@ -1,4 +1,0 @@
-build/
-deps/*
-node_modules/
-.lock-wscript
